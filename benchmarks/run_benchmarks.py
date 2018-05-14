@@ -27,11 +27,11 @@ from benchmarks import settings
 from guardian.shortcuts import assign_perm
 from django.core.exceptions import ImproperlyConfigured
 from utils import show_settings
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from django.utils.termcolors import colorize
 from benchmarks.models import TestModel
 from benchmarks.models import TestDirectModel
-from guardian.models import UserObjectPermission
+from guardian.models import UserObjectPermission, Group
 from django.contrib.contenttypes.models import ContentType
 
 USERS_COUNT = 50
@@ -107,7 +107,8 @@ class Benchmark(object):
 
     def prepare_db(self):
         from django.core.management import call_command
-        call_command('syncdb', interactive=False)
+        call_command('makemigrations', interactive=False)
+        call_command('migrate', interactive=False)
 
         for model in [User, Group, self.Model]:
             model.objects.all().delete()

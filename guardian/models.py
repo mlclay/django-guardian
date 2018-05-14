@@ -1,12 +1,14 @@
 from __future__ import unicode_literals
-from django.contrib.auth.models import Group, Permission
+from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.six import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from guardian.compat import unicode, user_model_label
 from guardian.ctypes import get_content_type
 from guardian.managers import GroupObjectPermissionManager, UserObjectPermissionManager
+from guardian.utils import Group
 
 try:
     from django.contrib.contenttypes.fields import GenericForeignKey
@@ -14,6 +16,7 @@ except ImportError:
     from django.contrib.contenttypes.generic import GenericForeignKey
 
 
+@python_2_unicode_compatible
 class BaseObjectPermission(models.Model):
     """
     Abstract ObjectPermission class. Actual class should additionally define
@@ -24,7 +27,7 @@ class BaseObjectPermission(models.Model):
     class Meta:
         abstract = True
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s | %s | %s' % (
             unicode(self.content_object),
             unicode(getattr(self, 'user', False) or self.group),

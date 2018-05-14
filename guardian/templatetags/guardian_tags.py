@@ -8,21 +8,23 @@
 from __future__ import unicode_literals
 
 from django import template
-from django.contrib.auth.models import AnonymousUser, Group
+from django.contrib.auth.models import AnonymousUser
 
 from guardian.compat import get_user_model
 from guardian.core import ObjectPermissionChecker
 from guardian.exceptions import NotUserNorGroup
+from guardian.models import Group
 
 register = template.Library()
 
 
 class ObjectPermissionsNode(template.Node):
 
-    def __init__(self, for_whom, obj, context_var):
+    def __init__(self, for_whom, obj, context_var, checker=None):
         self.for_whom = template.Variable(for_whom)
         self.obj = template.Variable(obj)
         self.context_var = context_var
+        self.checker = template.Variable(checker) if checker else None
 
     def render(self, context):
         for_whom = self.for_whom.resolve(context)
@@ -41,8 +43,8 @@ class ObjectPermissionsNode(template.Node):
         obj = self.obj.resolve(context)
         if not obj:
             return ''
-
-        check = ObjectPermissionChecker(for_whom)
+        
+        check = self.checker.resolve(context) if self.checker else ObjectPermissionChecker(for_whom)
         perms = check.get_perms(obj)
 
         context[self.context_var] = perms
@@ -83,8 +85,8 @@ def get_obj_perms(parser, token):
 
     """
     bits = token.split_contents()
-    format = '{% get_obj_perms user/group for obj as "context_var" %}'
-    if len(bits) != 6 or bits[2] != 'for' or bits[4] != 'as':
+    format = '{% get_obj_perms user/group for obj as "context_var" perm_checker %}'
+    if not (6 <= len(bits) <= 7) or bits[2] != 'for' or bits[4] != 'as':
         raise template.TemplateSyntaxError("get_obj_perms tag should be in "
                                            "format: %s" % format)
 
@@ -95,4 +97,5 @@ def get_obj_perms(parser, token):
         raise template.TemplateSyntaxError("get_obj_perms tag's context_var "
                                            "argument should be in quotes")
     context_var = context_var[1:-1]
-    return ObjectPermissionsNode(for_whom, obj, context_var)
+    checker = bits[6] if len(bits) == 7 else None
+    return ObjectPermissionsNode(for_whom, obj, context_var, checker)

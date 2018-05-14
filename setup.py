@@ -3,7 +3,7 @@ from setuptools import setup
 from extras import RunFlakesCommand
 
 
-version = '1.4.8'
+version = '1.4.9'
 
 readme_file = os.path.join(os.path.dirname(__file__), 'README.rst')
 with open(readme_file, 'r') as f:
@@ -35,6 +35,10 @@ setup(
     classifiers=['Development Status :: 5 - Production/Stable',
                  'Environment :: Web Environment',
                  'Framework :: Django',
+                 'Framework :: Django :: 1.8',
+                 'Framework :: Django :: 1.9',
+                 'Framework :: Django :: 1.10',
+                 'Framework :: Django :: 1.11',
                  'Intended Audience :: Developers',
                  'License :: OSI Approved :: BSD License',
                  'Operating System :: OS Independent',

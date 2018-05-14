@@ -1,9 +1,5 @@
 from __future__ import unicode_literals
-# OrderedDict only available in Python 2.7.
-# This will always be the case in Django 1.7 and above, as these versions
-# no longer support Python 2.6.
 
-from collections import OrderedDict
 from django.conf import settings
 from django.conf.urls import handler404, handler500, include, url
 from django.contrib.auth.models import AnonymousUser, Group, Permission
@@ -34,7 +30,6 @@ __all__ = [
 # to get_user_model deferred to execution time
 
 user_model_label = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
-
 try:
     from django.contrib.auth import get_user_model
 except ImportError:
